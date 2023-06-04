@@ -22,6 +22,7 @@
 
 #include "pantryio_dbus_server.h"
 
+/***** STATIC ******/
 static GDBusNodeInfo *introspection_data = NULL;
 
 static const gchar introspection_xml[] =
@@ -36,34 +37,6 @@ static const gchar introspection_xml[] =
     "  </interface>"
     "</node>";
 
-void
-pio_emit_data_changed_signal(void)
-{
-        gboolean ret;
-        GDBusConnection* connection;
-        GError* error;
-        error = NULL;
-
-        connection = g_bus_get_sync(G_BUS_TYPE_SESSION, NULL, &error);
-        if (error != NULL) {
-            g_printerr("Failed to get bus connection: %s\n", error->message);
-            g_error_free(error);
-            return;
-        }
-
-        ret = g_dbus_connection_emit_signal(connection,
-                                            NULL,
-                                            PIO_DBUS_SERVER_OBJECT_PATH,
-                                            PIO_DBUS_SERVER_INTERFACE_NAME,
-                                            PIO_DATA_CHANGED_SIGNAL,
-                                            NULL,
-                                            &error);
-        if (error != NULL) {
-            printf("Try print error\n");
-            g_printerr ("Error?: %s\n", error->message);
-            g_error_free(error);
-        }
-}
 
 /**
  * @brief Handle Pantry-io-communications DBus interface communication.
@@ -117,8 +90,8 @@ on_new_connection (GDBusServer *server,
                    gpointer user_data)
 {
     guint registration_id;
-    g_object_ref (connection);
-    g_signal_connect (connection, "closed", G_CALLBACK (connection_closed), NULL);
+    g_object_ref(connection);
+    g_signal_connect(connection, "closed", G_CALLBACK (connection_closed), NULL);
     registration_id = g_dbus_connection_register_object(connection,
                                                         PIO_DBUS_SERVER_OBJECT_PATH,
                                                         introspection_data->interfaces[0],
@@ -132,9 +105,9 @@ on_new_connection (GDBusServer *server,
 
 
 static gboolean
-allow_mechanism_cb (GDBusAuthObserver *observer,
-                    const gchar *mechanism,
-                    G_GNUC_UNUSED gpointer user_data)
+allow_mechanism_cb(GDBusAuthObserver *observer,
+                   const gchar *mechanism,
+                   G_GNUC_UNUSED gpointer user_data)
 {
     return TRUE;
 }
@@ -152,17 +125,17 @@ authorize_authenticated_peer_cb (GDBusAuthObserver *observer,
         GCredentials *own_credentials;
         gchar *credentials_string = NULL;
 
-        credentials_string = g_credentials_to_string (credentials);
+        credentials_string = g_credentials_to_string(credentials);
         g_print ("Peer's credentials: %s\n", credentials_string);
         g_free (credentials_string);
 
         own_credentials = g_credentials_new ();
 
-        credentials_string = g_credentials_to_string (own_credentials);
-        g_print ("Server's credentials: %s\n", credentials_string);
-        g_free (credentials_string);
+        credentials_string = g_credentials_to_string(own_credentials);
+        g_print("Server's credentials: %s\n", credentials_string);
+        g_free(credentials_string);
 
-        if (g_credentials_is_same_user (credentials, own_credentials, NULL))
+        if (g_credentials_is_same_user(credentials, own_credentials, NULL))
             authorized = TRUE;
 
         g_object_unref (own_credentials);
@@ -171,11 +144,35 @@ authorize_authenticated_peer_cb (GDBusAuthObserver *observer,
     return authorized;
 }
 
-/**
- * @brief Create the pantry-io-communicator DBus server.
- * The caller must call g_object_unref(server) when finished with the server.
- * @return GDBusServer* server
- */
+/***** PUBLIC ******/
+void
+pio_emit_data_changed_signal(void)
+{
+        gboolean ret;
+        GDBusConnection* connection;
+        GError* error;
+        error = NULL;
+
+        connection = g_bus_get_sync(G_BUS_TYPE_SESSION, NULL, &error);
+        if (error != NULL) {
+            g_printerr("Failed to get bus connection: %s\n", error->message);
+            g_error_free(error);
+            return;
+        }
+
+        ret = g_dbus_connection_emit_signal(connection,
+                                            NULL,
+                                            PIO_DBUS_SERVER_OBJECT_PATH,
+                                            PIO_DBUS_SERVER_INTERFACE_NAME,
+                                            PIO_DATA_CHANGED_SIGNAL,
+                                            NULL,
+                                            &error);
+        if (error != NULL) {
+            g_printerr("Error emitting signal: %s\n", error->message);
+            g_error_free(error);
+        }
+}
+
 GDBusServer*
 pio_create_dbus_server()
 {
@@ -183,7 +180,7 @@ pio_create_dbus_server()
     GError *error;
 
     introspection_data = g_dbus_node_info_new_for_xml(introspection_xml, &error);
-    g_assert (introspection_data != NULL);
+    g_assert(introspection_data != NULL);
 
     GDBusAuthObserver *observer;
     GDBusServer *server;
@@ -194,9 +191,9 @@ pio_create_dbus_server()
 
     server_flags = G_DBUS_SERVER_FLAGS_NONE;
 
-    observer = g_dbus_auth_observer_new ();
-    g_signal_connect (observer, "allow-mechanism", G_CALLBACK (allow_mechanism_cb), NULL);
-    g_signal_connect (observer, "authorize-authenticated-peer", G_CALLBACK (authorize_authenticated_peer_cb), NULL);
+    observer = g_dbus_auth_observer_new();
+    g_signal_connect(observer, "allow-mechanism", G_CALLBACK (allow_mechanism_cb), NULL);
+    g_signal_connect(observer, "authorize-authenticated-peer", G_CALLBACK (authorize_authenticated_peer_cb), NULL);
 
     error = NULL;
     server = g_dbus_server_new_sync(PIO_UNIX_ADDRESS,
@@ -211,13 +208,13 @@ pio_create_dbus_server()
     g_free(guid);
 
     if (server == NULL) {
-        g_printerr ("Error creating server at address %s: %s\n", PIO_UNIX_ADDRESS, error->message);
-        g_error_free (error);
+        g_printerr("Error creating server at address %s: %s\n", PIO_UNIX_ADDRESS, error->message);
+        g_error_free(error);
     }
     g_print("Server is listening at: %s\n", g_dbus_server_get_client_address(server));
-    g_signal_connect (server,
-                      "new-connection",
-                      G_CALLBACK (on_new_connection),
-                      NULL);
+    g_signal_connect(server,
+                     "new-connection",
+                     G_CALLBACK (on_new_connection),
+                     NULL);
     return server;
 }

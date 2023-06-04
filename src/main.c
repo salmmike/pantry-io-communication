@@ -32,7 +32,7 @@ int main()
 
     server = pio_create_dbus_server();
 
-    loop = g_main_loop_new (NULL, FALSE);
+    loop = g_main_loop_new(NULL, FALSE);
     g_main_loop_run(loop);
 
     g_object_unref(server);
