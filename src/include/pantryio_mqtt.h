@@ -20,28 +20,17 @@
 * SOFTWARE.
 */
 
-#include <stdio.h>
-#include <glib.h>
-#include <gio/gio.h>
 #include <mosquitto.h>
 
-#include "pantryio_dbus_server.h"
+/**
+ * @brief Starts the pantry-io MQTT subscriber.
+ * @param mosq struct mosquitto** where the mosquitto client is initialized.
+ * @return non-zero value on failure.
+ */
+int pio_init_mqtt_subscriber(struct mosquitto** mosq);
 
-int
-main()
-{
-    GDBusServer *server;
-    GMainLoop *loop;
-
-    struct mosquitto* mosq;
-    pio_init_mqtt_subscriber(&mosq);
-
-    server = pio_create_dbus_server();
-
-    loop = g_main_loop_new(NULL, FALSE);
-    g_main_loop_run(loop);
-
-    g_object_unref(server);
-    g_main_loop_unref(loop);
-    pio_mqtt_stop(mosq);
-}
+/**
+ * @brief Stops the pantry-io MQTT subscriber.
+ * @param mosq the mosquitto struct used with init_mqtt_subscriber
+ */
+void pio_mqtt_stop(struct mosquitto* mosq);
