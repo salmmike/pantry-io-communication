@@ -21,7 +21,7 @@ int main(){
 
     mosquitto_publish(mosq,
                       NULL,
-                      "pantry-io/testdeviceid/item-changed",
+                      "pantry-io/testdeviceid/items",
                       (unsigned int) strlen(payload),
                       payload,
                       0,
