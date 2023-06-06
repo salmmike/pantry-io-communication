@@ -26,6 +26,7 @@
 #include <mosquitto.h>
 
 #include "pantryio_dbus_server.h"
+#include "pantryio_mqtt.h"
 
 int
 main()

@@ -61,7 +61,6 @@ handle_method_call (G_GNUC_UNUSED
         gchar *response = "abc=1,123=0,cdef=0,longstring item with space=1";
         g_dbus_method_invocation_return_value(invocation,
                                               g_variant_new("(s)", response));
-        pio_emit_data_changed_signal();
     }
 }
 
@@ -146,7 +145,7 @@ authorize_authenticated_peer_cb (GDBusAuthObserver *observer,
 
 /***** PUBLIC ******/
 void
-pio_emit_data_changed_signal(void)
+pio_emit_data_changed_signal(const char* data)
 {
         gboolean ret;
         GDBusConnection* connection;
@@ -165,7 +164,7 @@ pio_emit_data_changed_signal(void)
                                             PIO_DBUS_SERVER_OBJECT_PATH,
                                             PIO_DBUS_SERVER_INTERFACE_NAME,
                                             PIO_DATA_CHANGED_SIGNAL,
-                                            NULL,
+                                            g_variant_new("(s)", data),
                                             &error);
         if (error != NULL) {
             g_printerr("Error emitting signal: %s\n", error->message);

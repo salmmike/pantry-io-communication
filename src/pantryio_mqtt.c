@@ -21,6 +21,8 @@
 */
 
 #include "pantryio_mqtt.h"
+#include "pantryio_dbus_server.h"
+
 #include <stdio.h>
 
 #define PIO_MQTT_SUBSCRIBER "pantry-io-mqtt-subscriber"
@@ -43,7 +45,8 @@ message_cb(struct mosquitto *mosq,
            void *obj,
            const struct mosquitto_message *msg)
 {
-	printf("Pantry-io MQTT message %s: %s\n", msg->topic, (char *) msg->payload);
+    printf("Pantry-io MQTT message %s: %s\n", msg->topic, (char *) msg->payload);
+    pio_emit_data_changed_signal(msg->payload);
 }
 
 int
@@ -52,27 +55,29 @@ pio_init_mqtt_subscriber(struct mosquitto** mosq)
     int rc;
     int id = 12;
 
-	mosquitto_lib_init();
+    rc = mosquitto_lib_init();
+    if (rc != MOSQ_ERR_SUCCESS) {
+        printf("Mosquitto lib init failed: %d\n", rc);
+    }
 
-	*mosq = mosquitto_new(PIO_MQTT_SUBSCRIBER, true, &id);
-	mosquitto_connect_callback_set(*mosq, connect_cb);
-	mosquitto_message_callback_set(*mosq, message_cb);
+    *mosq = mosquitto_new(PIO_MQTT_SUBSCRIBER, true, &id);
+    mosquitto_connect_callback_set(*mosq, connect_cb);
+    mosquitto_message_callback_set(*mosq, message_cb);
 
-	rc = mosquitto_connect(*mosq, "localhost", 1883, 10);
-	if(rc) {
-		printf("Connecting to broker failed: %d\n", rc);
-		return -1;
+    rc = mosquitto_connect(*mosq, "localhost", 1883, 10);
+    if(rc) {
+        printf("Connecting to broker failed: %d\n", rc);
+        return -1;
 	}
 
-	mosquitto_loop_start(*mosq);
+    mosquitto_loop_start(*mosq);
     return 0;
 }
 
 void
 pio_mqtt_stop(struct mosquitto* mosq)
 {
-	mosquitto_loop_stop(mosq, true);
-
+    mosquitto_loop_stop(mosq, true);
     mosquitto_disconnect(mosq);
     mosquitto_destroy(mosq);
     mosquitto_lib_cleanup();

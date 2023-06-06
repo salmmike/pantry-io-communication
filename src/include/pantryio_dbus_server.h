@@ -35,7 +35,7 @@
  * This should be called when ever the data changes.
  */
 void
-pio_emit_data_changed_signal(void);
+pio_emit_data_changed_signal(const char* data);
 
 /**
  * @brief Create the pantry-io-communicator DBus server.

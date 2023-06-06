@@ -34,3 +34,11 @@ int pio_init_mqtt_subscriber(struct mosquitto** mosq);
  * @param mosq the mosquitto struct used with init_mqtt_subscriber
  */
 void pio_mqtt_stop(struct mosquitto* mosq);
+
+/**
+ * @brief parse sender id from topic.
+ * @param topic The topic
+ * @return const char* with sender ID. Caller should free the return value.
+ * Returns NULL if unsuccessful.
+ */
+const char* pio_parse_sender_id(const char* topic);
