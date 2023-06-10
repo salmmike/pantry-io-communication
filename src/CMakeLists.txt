@@ -6,6 +6,7 @@ pkg_check_modules(Mosquitto IMPORTED_TARGET libmosquitto REQUIRED)
 set(SOURCES
     main.c
     pantryio_mqtt.c
+    pantryio_bluetooth.c
     pantryio_dbus_server.c)
 
 set(INCLUDEDIR include)
@@ -14,6 +15,6 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDEDIR})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE PkgConfig::glib PkgConfig::Mosquitto)
+target_link_libraries(${PROJECT_NAME} PRIVATE PkgConfig::glib PkgConfig::Mosquitto bluetooth)
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${BINARY_DIR})
