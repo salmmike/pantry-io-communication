@@ -144,6 +144,7 @@ authorize_authenticated_peer_cb (GDBusAuthObserver *observer,
 }
 
 /***** PUBLIC ******/
+
 void
 pio_emit_data_changed_signal(const char* data)
 {

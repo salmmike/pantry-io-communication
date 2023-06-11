@@ -1,4 +1,3 @@
-set(LIBNAME ${PROJECT_NAME}lib)
 set(INCDIR ${CMAKE_CURRENT_LIST_DIR}/include/)
 
 set(LIBHEADERS

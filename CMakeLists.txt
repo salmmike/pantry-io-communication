@@ -1,6 +1,8 @@
 project(pantry-io-communication C)
 cmake_minimum_required(VERSION 3.22)
 
+set(LIBNAME pio-communicator)
+
 add_subdirectory(src)
 add_subdirectory(lib)
 
