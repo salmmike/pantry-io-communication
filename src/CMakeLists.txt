@@ -1,20 +1,8 @@
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(glib REQUIRED IMPORTED_TARGET glib-2.0 gio-2.0)
-pkg_check_modules(Mosquitto IMPORTED_TARGET libmosquitto REQUIRED)
-
 set(SOURCES
-    main.c
-    pantryio_mqtt.c
-    pantryio_bluetooth.c
-    pantryio_dbus_server.c)
-
-set(INCLUDEDIR include)
+    main.c)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
-
-target_include_directories(${PROJECT_NAME} PRIVATE ${INCLUDEDIR})
-
-target_link_libraries(${PROJECT_NAME} PRIVATE PkgConfig::glib PkgConfig::Mosquitto bluetooth)
+target_link_libraries(${PROJECT_NAME} ${PROJECT_NAME}lib)
 
 install(TARGETS ${PROJECT_NAME} DESTINATION ${BINARY_DIR})
