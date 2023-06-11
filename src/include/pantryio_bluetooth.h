@@ -29,13 +29,27 @@ struct pio_bluetooth_device
     char* address;
 };
 
+void
+pio_print_bluetooth_devices(struct pio_bluetooth_device** devices);
+
+void
+pio_free_bluetooth_devices(struct pio_bluetooth_device** devices);
+
+/**
+ * @brief represents communicator bluetooth connection.
+ */
+struct pio_bluetooth_connection
+{
+    int dd;
+    int dev_id;
+};
+
 /**
  * @brief init bluetooth connections.
  * @return non-zero value on error.
- * @param dd the hci device descriptor.
  */
 int
-pio_bluetooth_init(int* dd);
+pio_bluetooth_init(struct pio_bluetooth_connection** conn);
 
 /**
  * @brief close down bluetooth connections.
@@ -43,7 +57,7 @@ pio_bluetooth_init(int* dd);
  * @param dd the hci device descriptor.
  */
 int
-pio_bluetooth_deinit(int* dd);
+pio_bluetooth_deinit(struct pio_bluetooth_connection** conn);
 
 /**
  * @brief Scan for nearby bluetooth devices.
@@ -52,8 +66,8 @@ pio_bluetooth_deinit(int* dd);
  * @return a NULL terminated array of pio_bluetooth_device*
  * or NULL if no devices are found.
  */
-struct pio_bluetooth_device*
-pio_scan_bt_devices(int* dd);
+struct pio_bluetooth_device**
+pio_scan_bt_devices(struct pio_bluetooth_connection* conn);
 
 /**
  * @brief Share wifi network info with a pantry-io sensor device.
@@ -62,4 +76,5 @@ pio_scan_bt_devices(int* dd);
  * @param dd the hci device descriptor.
  */
 int
-pio_share_wifi_credentials(int dd, struct pio_bluetooth_device* device);
+pio_share_wifi_credentials(struct pio_bluetooth_connection* conn,
+                           struct pio_bluetooth_device* device);
