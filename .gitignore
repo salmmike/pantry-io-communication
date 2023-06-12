@@ -1,5 +1,10 @@
-Makefile
-CMakefile/
+**/Makefile
+**/CMakeFiles/
+**/Testing/
 *.cmake
 CMakeCache.txt
 .vscode/
+build/
+_deps/
+*.a
+*.tcl
