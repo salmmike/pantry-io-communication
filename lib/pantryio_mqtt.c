@@ -24,6 +24,8 @@
 #include "pantryio_dbus_server.h"
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define PIO_MQTT_SUBSCRIBER "pantry-io-mqtt-subscriber"
 
@@ -81,4 +83,15 @@ pio_mqtt_stop(struct mosquitto* mosq)
     mosquitto_disconnect(mosq);
     mosquitto_destroy(mosq);
     mosquitto_lib_cleanup();
+}
+
+const char*
+pio_mqtt_parse_sender_id(const char *topic)
+{
+    char* begin = strstr(topic, "/") + 1;
+    char* end = strstr(begin + 1, "/");
+    char* res = calloc(end - begin + 1, sizeof(char));
+
+    memcpy(res, begin, end - begin);
+    return res;
 }

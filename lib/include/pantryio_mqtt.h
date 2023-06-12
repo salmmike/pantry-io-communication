@@ -42,4 +42,4 @@ void pio_mqtt_stop(struct mosquitto* mosq);
  * Caller should free the return value.
  */
 const char*
-pio_parse_sender_id(const char* topic);
+pio_mqtt_parse_sender_id(const char* topic);
