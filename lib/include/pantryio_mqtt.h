@@ -38,7 +38,8 @@ void pio_mqtt_stop(struct mosquitto* mosq);
 /**
  * @brief parse sender id from topic.
  * @param topic The topic
- * @return const char* with sender ID. Caller should free the return value.
- * Returns NULL if unsuccessful.
+ * @return const char* with sender ID. Returns NULL if unsuccessful.
+ * Caller should free the return value.
  */
-const char* pio_parse_sender_id(const char* topic);
+const char*
+pio_parse_sender_id(const char* topic);
