@@ -29,12 +29,32 @@ struct pio_bluetooth_device
     char* name;
 };
 
+/**
+* @brief Print devices in an array of pio_bluetooth_device
+*/
 void
 pio_print_bluetooth_devices(struct pio_bluetooth_device** devices);
 
+
+/**
+* @brief Create a new bluetooth device struct with name and address
+* @param name
+* @param addr
+* @return pointer to pio_bluetooth_device. Caller must call the
+* pio_free_bluetooth_device to free this struct.
+*/
+struct pio_bluetooth_device*
+pio_new_bluetooth_device(const char* name, const char* addr);
+
+/**
+* @brief Free a pio_bluetooth_device struct.
+*/
 void
 pio_free_bluetooth_device(struct pio_bluetooth_device *device);
 
+/**
+ * Free an array of pio_bluetooth_device*
+ */
 void
 pio_free_bluetooth_devices(struct pio_bluetooth_device** devices);
 
@@ -61,9 +81,6 @@ pio_bluetooth_init(struct pio_bluetooth_connection** conn);
  */
 int
 pio_bluetooth_deinit(struct pio_bluetooth_connection** conn);
-
-struct pio_bluetooth_device*
-pio_new_bluetooth_device(const char* name, const char* addr);
 
 /**
  * @brief Scan for nearby bluetooth devices.
