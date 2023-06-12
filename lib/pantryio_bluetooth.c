@@ -14,24 +14,53 @@
 void
 pio_print_bluetooth_devices(struct pio_bluetooth_device **devices)
 {
-    while (*devices != NULL)
-    {
-        printf("name: %s, address: %s\n", (*devices)->name, (*devices)->address);
-        devices++;
+    if (devices == NULL) {
+        return;
     }
+
+    size_t i = 0;
+    while (devices[i] != NULL)
+    {
+        printf("name: %s, address: %s\n", devices[i]->name, devices[i]->address);
+        i++;
+    }
+}
+
+
+struct pio_bluetooth_device*
+pio_new_bluetooth_device(const char *name, const char *addr)
+{
+    struct pio_bluetooth_device* device = malloc(sizeof(struct pio_bluetooth_device));
+    device->address = calloc((strnlen(addr, MAX_BT_ADDRESS_LEN) + 1), sizeof(char));
+    device->name = calloc((strnlen(name, MAX_BT_NAME_LEN) + 1), sizeof(char));
+    strcpy(device->name, name);
+    strcpy(device->address, addr);
+
+    return device;
+}
+
+void
+pio_free_bluetooth_device(struct pio_bluetooth_device *device)
+{
+    free(device->name);
+    free(device->address);
+    free(device);
 }
 
 void
 pio_free_bluetooth_devices(struct pio_bluetooth_device **devices)
 {
-    while (*devices != NULL)
-    {
-        free((*devices)->name);
-        free((*devices)->address);
-        free(*devices);
-        devices++;
+    if (devices == NULL) {
+        return;
     }
-    *devices = NULL;
+
+    int i = 0;
+    while (devices[i] != NULL)
+    {
+        pio_free_bluetooth_device(devices[i]);
+        ++i;
+    }
+    free(devices);
 }
 
 int
@@ -59,7 +88,8 @@ pio_bluetooth_init(struct pio_bluetooth_connection **conn)
     return 0;
 }
 
-int pio_bluetooth_deinit(struct pio_bluetooth_connection** conn)
+int
+pio_bluetooth_deinit(struct pio_bluetooth_connection** conn)
 {
     int rc = 0;
     if (*conn != NULL) {
@@ -70,7 +100,8 @@ int pio_bluetooth_deinit(struct pio_bluetooth_connection** conn)
     return rc;
 }
 
-struct pio_bluetooth_device **pio_scan_bt_devices(struct pio_bluetooth_connection* conn)
+struct pio_bluetooth_device**
+pio_scan_bt_devices(struct pio_bluetooth_connection* conn)
 {
     int len;
     int max_rsp;
@@ -89,30 +120,25 @@ struct pio_bluetooth_device **pio_scan_bt_devices(struct pio_bluetooth_connectio
 
     if ((num_rsp = hci_inquiry(conn->dev_id, len, max_rsp, NULL, &ii, flags)) < 0) {
         printf("hci_inquiry failed: %d\n", num_rsp);
+        free(ii);
         return NULL;
     }
 
-    found_devices = malloc(sizeof(struct pio_bluetooth_device) * (num_rsp + 1));
+    found_devices = malloc(sizeof(struct pio_bluetooth_device*) * (num_rsp + 1));
     found_devices[num_rsp] = NULL;
 
     for (int i = 0; i < num_rsp; i++) {
-        ba2str(&(ii+i)->bdaddr, addr);
+        ba2str(&ii[i].bdaddr, addr);
         memset(name, 0, sizeof(name));
 
-        if (hci_read_remote_name(conn->dd, &(ii+i)->bdaddr, sizeof(name), name, 0) < 0) {
+        if (hci_read_remote_name(conn->dd, &ii[i].bdaddr, sizeof(name), name, 0) < 0) {
             strcpy(name, "[unknown]");
         }
 
-        struct pio_bluetooth_device* found_device = malloc(sizeof(struct pio_bluetooth_device));
-        found_device->name = malloc(strnlen(name, MAX_BT_NAME_LEN) * sizeof(char));
-        found_device->address = malloc(strnlen(name, MAX_BT_ADDRESS_LEN) * sizeof(char));
-
-        strncpy(found_device->name, name, MAX_BT_NAME_LEN);
-        strncpy(found_device->address, addr, MAX_BT_ADDRESS_LEN);
-        *(found_devices + i) = found_device;
+        struct pio_bluetooth_device* found_device = pio_new_bluetooth_device(name, addr);
+        found_devices[i] = found_device;
     }
 
     free(ii);
-
     return found_devices;
 }

@@ -25,12 +25,15 @@
  */
 struct pio_bluetooth_device
 {
-    char* name;
     char* address;
+    char* name;
 };
 
 void
 pio_print_bluetooth_devices(struct pio_bluetooth_device** devices);
+
+void
+pio_free_bluetooth_device(struct pio_bluetooth_device *device);
 
 void
 pio_free_bluetooth_devices(struct pio_bluetooth_device** devices);
@@ -58,6 +61,9 @@ pio_bluetooth_init(struct pio_bluetooth_connection** conn);
  */
 int
 pio_bluetooth_deinit(struct pio_bluetooth_connection** conn);
+
+struct pio_bluetooth_device*
+pio_new_bluetooth_device(const char* name, const char* addr);
 
 /**
  * @brief Scan for nearby bluetooth devices.
