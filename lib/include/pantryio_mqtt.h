@@ -27,13 +27,15 @@
  * @param mosq struct mosquitto** where the mosquitto client is initialized.
  * @return non-zero value on failure.
  */
-int pio_init_mqtt_subscriber(struct mosquitto** mosq);
+int
+pio_init_mqtt_subscriber(struct mosquitto** mosq);
 
 /**
  * @brief Stops the pantry-io MQTT subscriber.
  * @param mosq the mosquitto struct used with init_mqtt_subscriber
  */
-void pio_mqtt_stop(struct mosquitto* mosq);
+void
+pio_mqtt_stop(struct mosquitto* mosq);
 
 /**
  * @brief parse sender id from topic.
